@@ -1,5 +1,6 @@
 ---
-title: "NFL Analysis"
+title: "Field Dynamics" 
+subtitle: "An Analysis of Offensive Strategies in the Modern Day NFL"
 author: "Alexander Guarasci"
 thanks: "Code and data underpinning this paper are available at: https://github.com/AlexanderG123/nfl_analysis"
 date: "`r format(Sys.Date(), '%B %d, %Y')`" # This will add the current date
@@ -10,7 +11,7 @@ execute:
 format: pdf
 fig-pos: "H"
 abstract: |
- This paper is the shit
+ This study examines the strategy behind National Football League (NFL) games, focusing on how teams' offensive yardage—gained through both rushing and passing—affects their chances of winning. Analyzing play-by-play data from the 2023 NFL season, we discovered that while both rushing and passing yards contribute to game victories, a stronger rushing attack significantly increases a team's likelihood of winning. These findings highlight the critical role of offensive strategy in football, providing valuable insights for teams looking to optimize their game plans for better outcomes.
 
 ---
 
@@ -21,9 +22,11 @@ knitr::opts_chunk$set(echo = FALSE, results = "hide", message = FALSE, warning =
 
 # Introduction {#sec-intro} 
 
-When it comes to professional football, there has long been conjecture that a team's performance in games is closely correlated with their offensive yardage total, which includes both passing and running yards. In order to find patterns and insights that could affect team strategy and fan comprehension of the game dynamics, this study conducts a thorough statistical analysis of the complex link between various offensive yard measurements and the probability of winning NFL games. This research attempts to quantify the effect of offensive performance on game outcomes by methodically analyzing play-by-play data for the 2023 NFL season. It provides a thorough summary of how offensive yardage affects a team's victory both throughout the entire game and when focusing only on the statistics for the fourth quarter.
+When it comes to professional football, there has long been conjecture that a team's performance in games is closely correlated with their offensive yardage total, which includes both passing and running yards. In order to find patterns and insights that could affect team strategy and fan comprehension of the game dynamics, this study conducts a thorough statistical analysis of the complex link between various offensive yard measurements and the probability of winning NFL games. This research attempts to quantify the effect of offensive performance on game outcomes by methodically analyzing play-by-play data for the 2023 NFL season. It provides a thorough summary of how offensive yardage affects a team's victory both throughout the entire game and when focusing only on the statistics for the fourth quarter. Ultimately trying to answer the questions, how do offensive yards impact the outcome of an NFL game, and what is more valuable passing yards or rushing yards[^note]?
 
-The constant discussion among coaches, commentators, and fans over the best tactics for winning football games is what inspired this research. Although conventional wisdom has frequently emphasized the significance of a balanced offence—one that features a dynamic rushing (note: rushing and running are used interchangeably in this paper) attack in addition to a solid passing game—the empirical evidence that backs up this claim has been largely anecdotal. This paper presents a data-driven investigation of the correlations between various offensive methods and winning games. This analysis will help to provide insights into tactical choices and advance our knowledge of football analytics.
+[^note]: Rushing yards and running yards are used interchangeably throughout this paper
+
+The constant discussion among coaches, commentators, and fans over the best tactics for winning football games is what inspired this research. Although conventional wisdom has frequently emphasized the significance of a balanced offence—one that features a dynamic rushing attack in addition to a solid passing game—the empirical evidence that backs up this claim has been largely anecdotal. This paper presents a data-driven investigation of the correlations between various offensive methods and winning games. This analysis will help to provide insights into tactical choices and advance our knowledge of football analytics.
 
 This analysis was conducted through the R programming language [@citeR] and supplemented with the analytical tools Tidyverse [@citetidyverse] and caret [@citecaret]. The dataset was assembled from play-by-play records of NFL games from NFLVerse [@citenflverse]. The data is analyzed using statistical methods, such as logistic regression, which provides insights into the relative value of passing and rushing in securing game wins. This method opens the door for further study in sports analytics and offensive strategy optimization while also illuminating the prevailing dynamics of effective offensive methods.
 
@@ -33,7 +36,7 @@ This study aims to make a substantial contribution to the conversation about spo
 
 # 2 Data {#sec-data}
 
-The data used in this paper was taken from nflverse [@citenflverse], which consists of “a set of packages dedicated to data of the National Football League.”. 
+The data used in this paper was taken from nflverse [@citenflverse], which consists of “a set of packages dedicated to data of the National Football League.” 
 
 # 2.1 The Dataset
 
@@ -82,7 +85,7 @@ In summary, the use of logistic regression models to analyze NFL game outcomes o
 As an overview of the whole data set, of the 285 games played in the NFL regular season and playoffs, there were 90 games where a team rushed for fewer yards than their opponent and won while there were 109 games where a team threw for fewer yards than their opponent and won. Prioritizing the rushing attack is further bolstered by the model which suggests that a rushing yard is more valuable than a passing yard. In only 72 games a team rushed and passed for more yards than their opponent and won the game and in 14 games a team rushed for and passed for fewer yards while winning the game.
 
 # 4.1 Graphical Results
-```{r}
+```{r, fig.cap= "The Rushing and Passing Yards of Every Game in 2023"}
 #| label: fig-1
 library(ggplot2)
 library(tidyverse)
@@ -98,7 +101,7 @@ ggplot(data, aes(x = RushingYards, y = PassingYards, color = as.factor(Win))) +
 @fig-1 shows the rushing yards and passing yards of winning teams over the 2023 NFL season. In examining the graph it is clear that the overall trend, more often than not, is that more rushing yards and more passing yards increase the likelihood of winning. The biggest outlier game, which resulted in the Miami Dolphins Rushing for 350 yards and passing for 376 yards on the Denver Broncos, led to a 70 to 20 victory for the Dolphins. Prior to that game, no team in the 21st century had scored 70 points in a game, this anecdotally shows how being able to run and pass the ball effectively is exceedingly helpful when it comes to scoring points and ultimately winning ball games. 
 
 
-```{r}
+```{r, fig.cap= "Violin Plot of Total Yards by Wins and Losses"}
 #| label: fig-2
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = as.factor(Win), y = TotalYards, fill = as.factor(Win))) +
@@ -113,7 +116,7 @@ ggplot(data, aes(x = as.factor(Win), y = TotalYards, fill = as.factor(Win))) +
 
 
 
-```{r}
+```{r, fig.cap= "Average Yards by Wins and Losses"}
 #| label: fig-3
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 avg_yards_by_outcome <- data |>
@@ -134,7 +137,7 @@ ggplot(avg_yards_by_outcome, aes(x = as.factor(Win), y = AverageYards, fill = Ya
 This is further reinforced by @fig-3 which shows the average passing and rushing yards of winning and losing teams. As you can see, the winning teams rushed and passed for more yards. The results become more interesting when we break them down in the fourth quarter.
 
 
-```{r}
+```{r, fig.cap= "Average Fourth-Quarter Yards by Wins and Losses"}
 #| label: fig-4
 avg_q4_yards_by_outcome <-  read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv") %>%
   group_by(Win) %>%
@@ -142,7 +145,7 @@ avg_q4_yards_by_outcome <-  read.csv("~/nfl_analysis/data/analysis_data/cleaned_
             AvgPassingYards = mean(Q4_PassingYards, na.rm = TRUE)) %>%
   pivot_longer(cols = -Win, names_to = "YardType", values_to = "AverageYards")
 
-# Plot the average Q4 rushing and passing yards for wins and losses
+
 ggplot(avg_q4_yards_by_outcome, aes(x = as.factor(Win), y = AverageYards, fill = YardType)) +
   geom_bar(stat = "identity", position = position_dodge(), color = "black") +
   scale_fill_manual(values = c("AvgRushingYards" = "skyblue", "AvgPassingYards" = "orange")) +
@@ -154,7 +157,7 @@ ggplot(avg_q4_yards_by_outcome, aes(x = as.factor(Win), y = AverageYards, fill =
 ```
 @fig-4 shows a stark difference in pass yards and rushing yards of the losing team.  This trend is substantially more pronounced than @fig-3 is and provides a much more interesting backdrop, teams that lose football games pass the ball substantially more than the teams that win, and in particular they do so in the fourth quarter.  
 
-```{r}
+```{r,fig.cap= "The Fourth-Quarter Rushing and Passing Yards of Every Game in 2023"}
 #| label: fig-5
 q4_final_data_for_modeling <-  read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv") 
 #4th q data Q4_RushingYards,Q4_PassingYards
@@ -169,7 +172,7 @@ ggplot(q4_final_data_for_modeling, aes(x = Q4_RushingYards, y = Q4_PassingYards,
 ```
 
 
-```{r}
+```{r, fig.cap= "Distribution of Rushing Yards by Wins and Losses"}
 #| label: fig-6
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = Q4_RushingYards, fill = as.factor(Win))) +
@@ -180,7 +183,7 @@ ggplot(data, aes(x = Q4_RushingYards, fill = as.factor(Win))) +
        fill = "Outcome") +
   theme_minimal()
 ```
-```{r}
+```{r, fig.cap= "The Distribution of Passing Yards by Wins and Losses"}
 #| label: fig-7
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = Q4_PassingYards, fill = as.factor(Win))) +
@@ -201,7 +204,7 @@ The regression on overall data indicated a positive relationship between rushing
 
 The second regression, using only fourth-quarter data, had more interesting results. Similar to the first model, there was a positive relationship between rushing yards and winning, but with fourth-quarter rushing yards being more valuable than overall game rushing yards.  Interestingly, there was a negative relationship between passing yardage and winning the game, in other words, the more passing yards a team had in the fourth quarter, the more likely that team was to lose the game.  This model was more accurately able to predict the outcome of games, correctly predicting 78.95% of winners and 66.67% of losers, for an overall balanced accuracy of 72.81%.
 
-# 5 Discussion
+# 5 Discussion {#sec-discussion}
 
 The analysis and models presented in this paper provide a deep dive into the strategic dynamics of NFL games, with a particular focus on the impact of rushing and passing strategies on game outcomes. Through the lens of logistic regression models—both encompassing overall game performance and isolating the critical fourth quarter—we uncover nuanced insights into the traditional adage of football: "the run game wins matches." The findings affirm this notion but also highlight the complexity behind strategic decisions made on the field, especially under the pressure of the game's closing moments.
 
