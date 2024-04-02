@@ -19,4 +19,4 @@ The repo is structured as:
 
 ## Statement on LLM usage
 
-Aspects of the code were written with the help of the ChatGPT-3.5
+Aspects of the code were written with the help of the ChatGPT-3.5, find the documentation in other/llm/usage.txt

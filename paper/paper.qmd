@@ -1,6 +1,6 @@
 ---
 title: "Field Dynamics" 
-subtitle: "An Analysis of Offensive Strategies in the Modern Day NFL"
+subtitle: "Why the Rush Game is still King in the Modern Day NFL"
 author: "Alexander Guarasci"
 thanks: "Code and data underpinning this paper are available at: https://github.com/AlexanderG123/nfl_analysis"
 date: "`r format(Sys.Date(), '%B %d, %Y')`" # This will add the current date
@@ -151,7 +151,7 @@ ggplot(avg_q4_yards_by_outcome, aes(x = as.factor(Win), y = AverageYards, fill =
   scale_fill_manual(values = c("AvgRushingYards" = "skyblue", "AvgPassingYards" = "orange")) +
   labs(title = "Average Q4 Rushing and Passing Yards for Wins and Losses",
        x = "Outcome (0 = Loss, 1 = Win)",
-       y = "Average Yards in Q4",
+       y = "Average Fourth-Quarter Yards",
        fill = "Type of Yards") +
   theme_minimal()
 ```
@@ -163,33 +163,33 @@ q4_final_data_for_modeling <-  read.csv("~/nfl_analysis/data/analysis_data/clean
 #4th q data Q4_RushingYards,Q4_PassingYards
 ggplot(q4_final_data_for_modeling, aes(x = Q4_RushingYards, y = Q4_PassingYards, color = as.factor(Win))) +
   geom_point() +
-  labs(title = "Rushing Yards vs. Passing Yards by Win/Loss 4th Q",
-       x = "Rushing Yards",
-       y = "Passing Yards",
+  labs(title = "Fourth-Quarter Rushing vs. Passing Yards by Win/Loss",
+       x = "Fourth-Quarter Rushing Yards",
+       y = "Fourth-Quarter Passing Yards",
        color = "Outcome") +
   theme_minimal()
 
 ```
 
 
-```{r, fig.cap= "Distribution of Rushing Yards by Wins and Losses"}
+```{r, fig.cap= "Distribution of Fourth-Quarter Rushing Yards by Wins and Losses"}
 #| label: fig-6
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = Q4_RushingYards, fill = as.factor(Win))) +
   geom_density(alpha = 0.5) +
-  labs(title = "Density of Rushing Yards by Win/Loss",
-       x = "Rushing Yards",
+  labs(title = "Density of Fourth-Quarter Rushing Yards by Win/Loss",
+       x = "Fourth-Quarter Rushing Yards",
        y = "Density",
        fill = "Outcome") +
   theme_minimal()
 ```
-```{r, fig.cap= "The Distribution of Passing Yards by Wins and Losses"}
+```{r, fig.cap= "The Distribution of Fourth-Quarter Passing Yards by Wins and Losses"}
 #| label: fig-7
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = Q4_PassingYards, fill = as.factor(Win))) +
   geom_density(alpha = 0.5) +
-  labs(title = "Density of Passing Yards by Win/Loss",
-       x = "Rushing Yards",
+  labs(title = "Density of Fourth-Quarter Passing Yards by Win/Loss",
+       x = "Fourth-Quarter Rushing Yards",
        y = "Density",
        fill = "Outcome") +
   theme_minimal()
