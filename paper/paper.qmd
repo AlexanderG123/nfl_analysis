@@ -1,6 +1,7 @@
 ---
-title: "Field Dynamics" 
-subtitle: "Why the Rush Game is still King in the Modern Day NFL"
+title: "Breaking Down the NFL: How Offensive Yards Shape Game Outcomes"
+subtitle: "Examining the Trends in Yardage of Winning NFL Teams Using Logistic Regression" 
+
 author: "Alexander Guarasci"
 thanks: "Code and data underpinning this paper are available at: https://github.com/AlexanderG123/nfl_analysis"
 date: "`r format(Sys.Date(), '%B %d, %Y')`" # This will add the current date
@@ -11,7 +12,7 @@ execute:
 format: pdf
 fig-pos: "H"
 abstract: |
- This study examines the strategy behind National Football League (NFL) games, focusing on how teams' offensive yardage—gained through both rushing and passing—affects their chances of winning. Analyzing play-by-play data from the 2023 NFL season, we discovered that while both rushing and passing yards contribute to game victories, a stronger rushing attack significantly increases a team's likelihood of winning. These findings highlight the critical role of offensive strategy in football, providing valuable insights for teams looking to optimize their game plans for better outcomes.
+ This study examines the strategy behind National Football League (NFL) games, focusing on how teams' offensive yardage—gained through both rushing and passing—affects their chances of winning using two logistic regression models. Analyzing play-by-play data from the 2023 NFL season, we discovered that while both rushing and passing yards contribute to game victories, a stronger rushing attack significantly increases a team's likelihood of winning. These findings highlight the critical role of offensive strategy in football, providing valuable insights for teams looking to optimize their game plans for better outcomes.
 
 ---
 
@@ -20,7 +21,7 @@ knitr::opts_chunk$set(echo = FALSE, results = "hide", message = FALSE, warning =
 
 ```
 
-# Introduction {#sec-intro} 
+# Introduction {#sec-introduction} 
 
 When it comes to professional football, there has long been conjecture that a team's performance in games is closely correlated with their offensive yardage total, which includes both passing and running yards. In order to find patterns and insights that could affect team strategy and fan comprehension of the game dynamics, this study conducts a thorough statistical analysis of the complex link between various offensive yard measurements and the probability of winning NFL games. This research attempts to quantify the effect of offensive performance on game outcomes by methodically analyzing play-by-play data for the 2023 NFL season. It provides a thorough summary of how offensive yardage affects a team's victory both throughout the entire game and when focusing only on the statistics for the fourth quarter. Ultimately trying to answer the questions, how do offensive yards impact the outcome of an NFL game, and what is more valuable passing yards or rushing yards[^note]?
 
@@ -46,7 +47,7 @@ Other statistics that were taken into consideration but ultimately not used incl
 
 # 2.2 Variables of interest
 
-This comprehensive dataset encapsulates a wide array of variables, central to which are “RushingYards”, “PassingYards”, “TotalYards”, “home_score”, “away_score”, “Winner”, “Win”, “Q4_RushingYards”, “Q4_PassingYards” and “Q4_TotalYards”. RushingYards and  PassingYards represent the yards gained by a team through rushing and passing plays, respectively, within a single game, while Q4_RushingYards and Q4_PassingYards represent the rushing and passing yards in the fourth-quarter. “RushingYards” is taken as the sum of the variable “rushing_yards” from the original dataset with the same “game_id” (so that we get the rushing yards from each game) and “posteam” (so each team that plays gets has their rushing yards tracked).  PassingYards, Q4_RushingYards and Q4_PassingYards are similarly constructed. TotalYards is a constructed variable, representing the sum of RushingYards and PassingYards, devised to encapsulate a team's overall offensive performance. Q4_TotalYards is constructed as the sum of Q4_RushingYards and Q4_PassingYards. The scores of the home and away teams are captured by home_score and away_score, respectively, which is data that is provided and that does not need to be constructed. The Winner is determined based on the comparison of these scores, classified as the team that won (for example, “Bal” if the Baltimore Ravens won). Finally, the binary Win variable signifies the outcome from the perspective of the team being analyzed (1 for a win, 0 for a loss, and “TIE” for a tie, but because there were no ties last season there are no instances of “TIE”). 
+This comprehensive dataset encapsulates a wide array of variables, central to which are “**RushingYards**”, “**PassingYards**”, “**TotalYards**”, “**home_score**”, “**away_score**”, “**Winner**”, “**Win**”, “**Q4_RushingYards**”, “**Q4_PassingYards**” and “**Q4_TotalYards**”. **RushingYards** and  **PassingYards** represent the yards gained by a team through rushing and passing plays, respectively, within a single game, while **Q4_RushingYards** and **Q4_PassingYards** represent the rushing and passing yards in the fourth-quarter. **RushingYards** is taken as the sum of the variable “**rushing_yards**” from the original dataset with the same “**game_id**” (so that we get the rushing yards from each game) and “**posteam**” (so each team that plays gets has their rushing yards tracked).  **PassingYards**, **Q4_RushingYards** and **Q4_PassingYards** are similarly constructed. **TotalYards** is a constructed variable, representing the sum of **RushingYards** and **PassingYards**, devised to encapsulate a team's overall offensive performance. **Q4_TotalYards** is constructed as the sum of **Q4_RushingYards** and **Q4_PassingYards**. The scores of the home and away teams are captured by **home_score** and **away_score**, respectively, which is data that is provided and that does not need to be constructed. The **Winner** is determined based on the comparison of these scores, classified as the team that won (for example, “Bal” if the Baltimore Ravens won). Finally, the binary **Win** variable signifies the outcome from the perspective of the team being analyzed (1 for a win, 0 for a loss, and “TIE” for a tie, but because there were no ties last season there are no instances of “TIE”). 
 
 Summary statistics were generated to provide an overarching view of the data's distribution and central tendencies. These statistics reveal an average of approximately 113 rushing yards and 238 passing yards per game, with total yards averaging around 350. The distribution of these variables, along with the game outcomes (Win), was visually examined through histograms and box plots, elucidating the central tendencies and variability within the data. These visual explorations further affirmed the preliminary assumption that a higher aggregate of offensive yards tends to correlate with a higher likelihood of winning.
 
@@ -58,16 +59,16 @@ Two logistic regression models were used in our study to analyze the NFL game dy
 
 # 3.1 Model 1: Overall Game Analysis
 
-The first logistic regression model scrutinizes the entire game, using rushing and passing yards as predictor variables to estimate the odds of winning. This model, expressed as $$
+The first logistic regression model scrutinizes the entire game, using rushing and passing yards as predictor variables to estimate the odds of winning. This first model, @eq-model1, expressed as $$
 \log\left(\frac{p_1}{1 - p_1}\right) = \beta_0 + \beta_1 \cdot \text{RushingYards} + \beta_2 \cdot \text{PassingYards}
-$$
+$$ {#eq-model1}
 , where p1 denotes the probability of winning, facilitates a broad analysis of strategic effectiveness. The coefficients, representing rushing and passing yards respectively, illuminate the value of each yard gained in the context of winning. The positive coefficient for rushing yards implies a direct correlation between a stronger rushing offence and the likelihood of victory, underscoring the strategic advantage of a balanced offensive game. This model is apt for providing a holistic view of game strategy, allowing analysts and teams to gauge the overall impact of their offensive efforts throughout the match.
 
 # 3.2 Model 2: Fourth Quarter Focus
 
-The second logistic regression model narrows the focus to the fourth quarter, a critical period where games are often decided. By analyzing the same predictors but confined to the final quarter, this model, $$
+The second logistic regression model, @eq-model2, narrows the focus to the fourth quarter, a critical period where games are often decided. By analyzing the same predictors but confined to the final quarter, this model, $$
 \log\left(\frac{p_2}{1-p_2}\right) = \beta_3 + \beta_4 \cdot \text{Q4\_RushingYards} + \beta_5 \cdot \text{Q4\_PassingYards}
-$$
+$$ {#eq-model2}
 , offers insights into the tactical shifts that dominate the endgame. Unlike the overall game model, the fourth-quarter model might reveal a nuanced strategic landscape, such as a negative coefficient for passing yards, indicating the potential pitfalls of a pass-heavy approach under pressure. This focused analysis is instrumental in understanding the dynamics of clutch gameplay, shedding light on the adjustments teams make in response to the scoreboard and the clock.
  
 # 3.3 Justification and Appropriateness
