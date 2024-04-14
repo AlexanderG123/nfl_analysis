@@ -1,4 +1,4 @@
-# Field Dynamics
+# Breaking Down the NFL: How Offensive Yards Shape Game Outcomes
 
 ## Overview of the Project
 
