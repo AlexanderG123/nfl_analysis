@@ -1,7 +1,7 @@
 #### Preamble ####
 # Purpose: Cleans and writes the data
 # Author: Alexander Guarasci
-# Date: 6 April 2023 [...UPDATE THIS...]
+# Date: 18 April, 2024
 # Contact: alexander.guarasci@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: install nflverse and tidyverse
@@ -15,19 +15,23 @@ pbp_data <- load_pbp(2023)
 
 team_game_stats <- pbp_data |>
   group_by(game_id, posteam) |>
-  summarize(RushingYards = sum(rushing_yards, na.rm = TRUE),
-            PassingYards = sum(passing_yards, na.rm = TRUE),
-            TotalYards = RushingYards + PassingYards,
-            .groups = 'drop')
+  summarize(
+    RushingYards = sum(rushing_yards, na.rm = TRUE),
+    PassingYards = sum(passing_yards, na.rm = TRUE),
+    TotalYards = RushingYards + PassingYards,
+    .groups = "drop"
+  )
 
 
 q4_team_game_stats <- pbp_data |>
   filter(qtr == 4) |>
   group_by(game_id, posteam) |>
-  summarize(Q4_RushingYards = sum(rushing_yards, na.rm = TRUE),
-            Q4_PassingYards = sum(passing_yards, na.rm = TRUE),
-            Q4_TotalYards = Q4_RushingYards + Q4_PassingYards,
-            .groups = 'drop')
+  summarize(
+    Q4_RushingYards = sum(rushing_yards, na.rm = TRUE),
+    Q4_PassingYards = sum(passing_yards, na.rm = TRUE),
+    Q4_TotalYards = Q4_RushingYards + Q4_PassingYards,
+    .groups = "drop"
+  )
 
 
 game_scores <- pbp_data |>
@@ -46,7 +50,7 @@ final_data_with_q4 <- team_game_stats |>
   select(game_id, posteam, RushingYards, PassingYards, TotalYards, home_score, away_score, Winner, Win, Q4_RushingYards, Q4_PassingYards, Q4_TotalYards)
 
 
-cleaned_data_1 <- final_data_with_q4 |>
+cleaned_data <- final_data_with_q4 |>
   filter(!is.na(posteam))
 
 write_csv(cleaned_data, file = "~/nfl_analysis/data/analysis_data/cleaned_data.csv")
