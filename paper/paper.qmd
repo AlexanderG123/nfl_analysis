@@ -18,7 +18,6 @@ abstract: |
 
 ```{r}
 knitr::opts_chunk$set(echo = FALSE, results = "hide", message = FALSE, warning = FALSE)
-
 ```
 
 # Introduction {#sec-introduction} 
@@ -29,7 +28,7 @@ When it comes to professional football, there has long been conjecture that a te
 
 The constant discussion among coaches, commentators, and fans over the best tactics for winning football games is what inspired this research. Although conventional wisdom has frequently emphasized the significance of a balanced offence—one that features a dynamic rushing attack in addition to a solid passing game—the empirical evidence that backs up this claim has been largely anecdotal. This paper presents a data-driven investigation of the correlations between various offensive methods and winning games. This analysis will help to provide insights into tactical choices and advance our knowledge of football analytics.
 
-This analysis was conducted through the R programming language [@citeR] and supplemented with the analytical tools Tidyverse [@citetidyverse] and caret [@citecaret]. The dataset was assembled from play-by-play records of NFL games from NFLVerse [@citenflverse]. The data is analyzed using statistical methods, such as logistic regression, which provides insights into the relative value of passing and rushing in securing game wins. This method opens the door for further study in sports analytics and offensive strategy optimization while also illuminating the prevailing dynamics of effective offensive methods.
+This analysis was conducted through the R programming language [@citeR] and supplemented with the analytical tools Tidyverse [@citetidyverse], caret [@citecaret] with the code styled using Styler [@citestyler]. The dataset was assembled from play-by-play records of NFL games from NFLVerse [@citenflverse]. The data is analyzed using statistical methods, such as logistic regression, which provides insights into the relative value of passing and rushing in securing game wins. This method opens the door for further study in sports analytics and offensive strategy optimization while also illuminating the prevailing dynamics of effective offensive methods.
 
 
 This study aims to make a substantial contribution to the conversation about sports analytics by offering a strong analytical framework for examining the connection between NFL game-winning and yards. It reveals insights into offensive strategy through in-depth statistical analysis and model-building, providing information for analysts, players and fans. The results of this study show how important data analysis is to sports strategy and how quantitative methods can potentially help improve competitive advantages in professional football.
@@ -93,10 +92,12 @@ library(tidyverse)
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = RushingYards, y = PassingYards, color = as.factor(Win))) +
   geom_point() +
-  labs(title = "Rushing Yards vs. Passing Yards by Win/Loss",
-       x = "Rushing Yards",
-       y = "Passing Yards",
-       color = "Outcome") +
+  labs(
+    title = "Rushing Yards vs. Passing Yards by Win/Loss",
+    x = "Rushing Yards",
+    y = "Passing Yards",
+    color = "Outcome"
+  ) +
   theme_minimal()
 ```
 @fig-1 shows the rushing yards and passing yards of winning teams over the 2023 NFL season. In examining the graph it is clear that the overall trend, more often than not, is that more rushing yards and more passing yards increase the likelihood of winning. The biggest outlier game, which resulted in the Miami Dolphins Rushing for 350 yards and passing for 376 yards on the Denver Broncos, led to a 70 to 20 victory for the Dolphins. Prior to that game, no team in the 21st century had scored 70 points in a game, this anecdotally shows how being able to run and pass the ball effectively is exceedingly helpful when it comes to scoring points and ultimately winning ball games. 
@@ -106,11 +107,13 @@ ggplot(data, aes(x = RushingYards, y = PassingYards, color = as.factor(Win))) +
 #| label: fig-2
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = as.factor(Win), y = TotalYards, fill = as.factor(Win))) +
-  geom_violin()+
-  labs(title = "Distribution of Total Yards by Win/Loss",
-       x = "Outcome (0 = Loss, 1 = Win)",
-       y = "Total Yards",
-       fill = "Outcome") +
+  geom_violin() +
+  labs(
+    title = "Distribution of Total Yards by Win/Loss",
+    x = "Outcome (0 = Loss, 1 = Win)",
+    y = "Total Yards",
+    fill = "Outcome"
+  ) +
   theme_minimal()
 ```
 @fig-2 supports this idea, it is a violin plot of the total yards of winning and losing teams (total yards is the sum of passing yards and rushing yards). What it shows is that winning teams never had fewer than 200 total yards, and had more total yardage on average than the teams that lost. It also shows that most winning teams had around 400 total yards while losing teams had just over 350 yards.  
@@ -122,17 +125,21 @@ ggplot(data, aes(x = as.factor(Win), y = TotalYards, fill = as.factor(Win))) +
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 avg_yards_by_outcome <- data |>
   group_by(Win) |>
-  summarize(AvgRushingYards = mean(RushingYards, na.rm = TRUE),
-            AvgPassingYards = mean(PassingYards, na.rm = TRUE)) |>
+  summarize(
+    AvgRushingYards = mean(RushingYards, na.rm = TRUE),
+    AvgPassingYards = mean(PassingYards, na.rm = TRUE)
+  ) |>
   pivot_longer(cols = -Win, names_to = "YardType", values_to = "AverageYards")
 
 ggplot(avg_yards_by_outcome, aes(x = as.factor(Win), y = AverageYards, fill = YardType)) +
   geom_bar(stat = "identity", position = position_dodge(), color = "black") +
   scale_fill_manual(values = c("AvgRushingYards" = "skyblue", "AvgPassingYards" = "orange")) +
-  labs(title = "Average Rushing and Passing Yards for Wins and Losses",
-       x = "Outcome (0 = Loss, 1 = Win)",
-       y = "Average Yards",
-       fill = "Type of Yards") +
+  labs(
+    title = "Average Rushing and Passing Yards for Wins and Losses",
+    x = "Outcome (0 = Loss, 1 = Win)",
+    y = "Average Yards",
+    fill = "Type of Yards"
+  ) +
   theme_minimal()
 ```
 This is further reinforced by @fig-3 which shows the average passing and rushing yards of winning and losing teams. As you can see, the winning teams rushed and passed for more yards. The results become more interesting when we break them down in the fourth quarter.
@@ -140,36 +147,41 @@ This is further reinforced by @fig-3 which shows the average passing and rushing
 
 ```{r, fig.cap= "Average Fourth-Quarter Yards by Wins and Losses"}
 #| label: fig-4
-avg_q4_yards_by_outcome <-  read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv") %>%
+avg_q4_yards_by_outcome <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv") %>%
   group_by(Win) %>%
-  summarize(AvgRushingYards = mean(Q4_RushingYards, na.rm = TRUE),
-            AvgPassingYards = mean(Q4_PassingYards, na.rm = TRUE)) %>%
+  summarize(
+    AvgRushingYards = mean(Q4_RushingYards, na.rm = TRUE),
+    AvgPassingYards = mean(Q4_PassingYards, na.rm = TRUE)
+  ) %>%
   pivot_longer(cols = -Win, names_to = "YardType", values_to = "AverageYards")
 
 
 ggplot(avg_q4_yards_by_outcome, aes(x = as.factor(Win), y = AverageYards, fill = YardType)) +
   geom_bar(stat = "identity", position = position_dodge(), color = "black") +
   scale_fill_manual(values = c("AvgRushingYards" = "skyblue", "AvgPassingYards" = "orange")) +
-  labs(title = "Average Q4 Rushing and Passing Yards for Wins and Losses",
-       x = "Outcome (0 = Loss, 1 = Win)",
-       y = "Average Fourth-Quarter Yards",
-       fill = "Type of Yards") +
+  labs(
+    title = "Average Q4 Rushing and Passing Yards for Wins and Losses",
+    x = "Outcome (0 = Loss, 1 = Win)",
+    y = "Average Fourth-Quarter Yards",
+    fill = "Type of Yards"
+  ) +
   theme_minimal()
 ```
 @fig-4 shows a stark difference in pass yards and rushing yards of the losing team.  This trend is substantially more pronounced than @fig-3 is and provides a much more interesting backdrop, teams that lose football games pass the ball substantially more than the teams that win, and in particular they do so in the fourth quarter.  
 
 ```{r,fig.cap= "The Fourth-Quarter Rushing and Passing Yards of Every Game in 2023"}
 #| label: fig-5
-q4_final_data_for_modeling <-  read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv") 
-#4th q data Q4_RushingYards,Q4_PassingYards
+q4_final_data_for_modeling <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+# 4th q data Q4_RushingYards,Q4_PassingYards
 ggplot(q4_final_data_for_modeling, aes(x = Q4_RushingYards, y = Q4_PassingYards, color = as.factor(Win))) +
   geom_point() +
-  labs(title = "Fourth-Quarter Rushing vs. Passing Yards by Win/Loss",
-       x = "Fourth-Quarter Rushing Yards",
-       y = "Fourth-Quarter Passing Yards",
-       color = "Outcome") +
+  labs(
+    title = "Fourth-Quarter Rushing vs. Passing Yards by Win/Loss",
+    x = "Fourth-Quarter Rushing Yards",
+    y = "Fourth-Quarter Passing Yards",
+    color = "Outcome"
+  ) +
   theme_minimal()
-
 ```
 
 
@@ -178,10 +190,12 @@ ggplot(q4_final_data_for_modeling, aes(x = Q4_RushingYards, y = Q4_PassingYards,
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = Q4_RushingYards, fill = as.factor(Win))) +
   geom_density(alpha = 0.5) +
-  labs(title = "Density of Fourth-Quarter Rushing Yards by Win/Loss",
-       x = "Fourth-Quarter Rushing Yards",
-       y = "Density",
-       fill = "Outcome") +
+  labs(
+    title = "Density of Fourth-Quarter Rushing Yards by Win/Loss",
+    x = "Fourth-Quarter Rushing Yards",
+    y = "Density",
+    fill = "Outcome"
+  ) +
   theme_minimal()
 ```
 ```{r, fig.cap= "The Distribution of Fourth-Quarter Passing Yards by Wins and Losses"}
@@ -189,10 +203,12 @@ ggplot(data, aes(x = Q4_RushingYards, fill = as.factor(Win))) +
 data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
 ggplot(data, aes(x = Q4_PassingYards, fill = as.factor(Win))) +
   geom_density(alpha = 0.5) +
-  labs(title = "Density of Fourth-Quarter Passing Yards by Win/Loss",
-       x = "Fourth-Quarter Rushing Yards",
-       y = "Density",
-       fill = "Outcome") +
+  labs(
+    title = "Density of Fourth-Quarter Passing Yards by Win/Loss",
+    x = "Fourth-Quarter Rushing Yards",
+    y = "Density",
+    fill = "Outcome"
+  ) +
   theme_minimal()
 ```
 Comparing @fig-5 with @fig-1, there is quite a contrast.  Whereas @fig-1 showed that winning teams ran and threw the ball more, @fig-5 shows the winning teams hugging the x-axis (more fourth-quarter rushing yards and fourth-quarter fewer passing yards), with losing teams hugging the y-axis (fewer fourth-quarter rushing yards and more fourth-quarter passing yards).  @fig-6 and @fig-7 show the distributions of fourth-quarter rushing and passing yards by winning and losing teams and both show how pronounced this trend is.
