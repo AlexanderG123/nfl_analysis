@@ -69,4 +69,11 @@ simulated_data_df <- as.data.frame(simulated_data, stringsAsFactors = FALSE)
 numerical_columns <- c("RushingYards", "PassingYards", "TotalYards", "home_score", "away_score", "Win", "Q4_RushingYards", "Q4_PassingYards", "Q4_TotalYards")
 simulated_data_df[numerical_columns] <- lapply(simulated_data_df[numerical_columns], as.numeric)
 
-write_csv(simulated_data_df, file = "~/nfl_analysis/data/analysis_data/sim_data.csv")
+write_csv(simulated_data_df, file = here::here("data/analysis_data/sim_data.csv"))
+          
+          
+          
+          
+          
+          
+          

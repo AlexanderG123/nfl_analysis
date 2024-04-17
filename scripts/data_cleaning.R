@@ -53,4 +53,4 @@ final_data_with_q4 <- team_game_stats |>
 cleaned_data <- final_data_with_q4 |>
   filter(!is.na(posteam))
 
-write_csv(cleaned_data, file = "~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+write_csv(cleaned_data, file = here::here("data/analysis_data/cleaned_data.csv"))

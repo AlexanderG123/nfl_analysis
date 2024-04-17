@@ -11,7 +11,7 @@
 library(tidyverse)
 
 # Load the data
-data <- read_csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+data <- read.csv(here::here("data/analysis_data/cleaned_data.csv"))
 
 # Function to print test results
 print_test_result <- function(test_name, result) {
