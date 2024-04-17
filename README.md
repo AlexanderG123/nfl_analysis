@@ -2,9 +2,9 @@
 
 ## Overview of the Project
 
-This repo documents the steps and processes used in creating the paper "Field Dynamics". 
+This repo documents the steps and processes used in creating the paper "Breaking Down the NFL: How Offensive Yards Shape Game Outcomes". 
 
-Use this folder to reproduce the results on your own.
+Use this folder to reproduce the results on your own. In order to do so, run data_cleaning.R in the scripts folder, then proceed to render paper.qmd in the paper folder. The models can be found in the model folder. 
 
  
 
