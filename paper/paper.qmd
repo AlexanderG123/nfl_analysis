@@ -22,25 +22,28 @@ knitr::opts_chunk$set(echo = FALSE, results = "hide", message = FALSE, warning =
 
 # Introduction {#sec-introduction} 
 
-When it comes to professional football, there has long been conjecture that a team's performance in games is closely correlated with their offensive yardage total, which includes both passing and running yards. In order to find patterns and insights that could affect team strategy and fan comprehension of the game dynamics, this study conducts a thorough statistical analysis of the complex link between various offensive yard measurements and the probability of winning NFL games. This research attempts to quantify the effect of offensive performance on game outcomes by methodically analyzing play-by-play data for the 2023 NFL season. It provides a thorough summary of how offensive yardage affects a team's victory both throughout the entire game and when focusing only on the statistics for the fourth quarter. Ultimately trying to answer the questions, how do offensive yards impact the outcome of an NFL game, and what is more valuable passing yards or rushing yards[^note]?
+When it comes to professional football, there has long been conjecture that a team's performance in games is closely correlated with their offensive yardage total, which includes both passing and running yards. In order to find patterns and insights that could affect team strategy and fan comprehension of the game dynamics, this study conducts a thorough statistical analysis of the complex link between various offensive yard measurements and the probability of winning NFL games. This research attempts to quantify the effect of offensive performance on game outcomes by methodically analyzing play-by-play data for the 2023 NFL season. It provides a thorough summary of how offensive yardage affects a team's victory both throughout the entire game and when focusing only on the statistics for the fourth quarter. Ultimately trying to answer the questions, how do offensive yards impact the outcome of an NFL game, and what is more valuable passing yards or rushing yards[^note]? Prior to examining the data, it was our estimation that in the modern, pass friendly NFL, a focus on throwing the football over the course of the game with a switch to the run game in the fourth-quarter is ultimately the best way for teams to win. 
 
-[^note]: Rushing yards and running yards are used interchangeably throughout this paper
+[^note]: Rushing yards and running yards are used interchangeably throughout this paper.
 
 The constant discussion among coaches, commentators, and fans over the best tactics for winning football games is what inspired this research. Although conventional wisdom has frequently emphasized the significance of a balanced offence—one that features a dynamic rushing attack in addition to a solid passing game—the empirical evidence that backs up this claim has been largely anecdotal. This paper presents a data-driven investigation of the correlations between various offensive methods and winning games. This analysis will help to provide insights into tactical choices and advance our knowledge of football analytics.
 
-This analysis was conducted through the R programming language [@citeR] and supplemented with the analytical tools Tidyverse [@citetidyverse], caret [@citecaret] with the code styled using Styler [@citestyler]. The dataset was assembled from play-by-play records of NFL games from NFLVerse [@citenflverse]. The data is analyzed using statistical methods, such as logistic regression, which provides insights into the relative value of passing and rushing in securing game wins. This method opens the door for further study in sports analytics and offensive strategy optimization while also illuminating the prevailing dynamics of effective offensive methods.
 
-
-This study aims to make a substantial contribution to the conversation about sports analytics by offering a strong analytical framework for examining the connection between NFL game-winning and yards. It reveals insights into offensive strategy through in-depth statistical analysis and model-building, providing information for analysts, players and fans. The results of this study show how important data analysis is to sports strategy and how quantitative methods can potentially help improve competitive advantages in professional football.
+This study aims to make a substantial contribution to the conversation about sports analytics by offering a strong analytical framework for examining the connection between NFL game-winning and yards. It reveals insights into offensive strategy through in-depth statistical analysis and model-building, providing information for analysts, players and fans. The results of this study show how important data analysis is to sports strategy and how quantitative methods can potentially help improve competitive advantages in professional football. This paper is broken up into four sections: the data section which discusses the data used in this paper; the model section explains the models that were used in this paper as well as why they were appropriate; the results section which explains what information was gained through this analysis; and finally the discussion section discusses the findings as a whole. 
 
 
 # 2 Data {#sec-data}
 
 The data used in this paper was taken from nflverse [@citenflverse], which consists of “a set of packages dedicated to data of the National Football League.” 
 
+This analysis was conducted through the R programming language [@citeR] and supplemented with the analytical tools Tidyverse [@citetidyverse], caret [@citecaret] with the code styled using Styler [@citestyler]. The dataset was assembled from play-by-play records of NFL games from NFLVerse [@citenflverse]. The data is analyzed using statistical methods, such as logistic regression, which provides insights into the relative value of passing and rushing in securing game wins. This method opens the door for further study in sports analytics and offensive strategy optimization while also illuminating the prevailing dynamics of effective offensive methods.
+
+
 # 2.1 The Dataset
 
-The foundation of the dataset that was ultimately used in this paper is the play-by-play data from across the 2023 NFL season. This includes an unbelievably dense array of information from every snap over the entirety of the season consisting of 372 variables. These include: seconds left in the half, touchdown probability, expected points added, the probability of taking a safety, the position the snap was taken in, a description of the play, and many, many more. In order to filter this information the play-by-play data was cleaned and new variables were created.
+The foundation of the dataset that was ultimately used in this paper is the play-by-play data from across the 2023 NFL season. This includes an unbelievably dense array of information from every snap over the entirety of the season consisting of 372 variables. These include seconds left in the half, touchdown probability, expected points added, the probability of taking a safety, the position the snap was taken in, a description of the play, and many, many more. In order to filter this information the play-by-play data was cleaned and new variables were created.
+
+The papers data preparation and cleaning process was streamlined, because of how robust the data from NFLVerse [@citenflverse] is. All that needed to be done was the construction of variables (discussed in section 2.2), but otherwise, there was no missing data or impactful decisions that needed to be made during the preparation phase. One thing to note is that the uncleaned dataset is not saved in this repo, this is because the size of the data is too large to store on github so this step was skipped. 
 
 Other statistics that were taken into consideration but ultimately not used included more detailed play-by-play assessments and analytics on the performance of individual players. It was determined that the comprehensive dataset with an emphasis on team-level performance indicators was the most suitable for investigating the overall correlation between offensive yardage and game results. This method avoids player-specific variability and enables a macro-level analysis, which is in accordance with the study's goal of outlining general strategic insights.
 
@@ -50,7 +53,7 @@ This comprehensive dataset encapsulates a wide array of variables, central to wh
 
 Summary statistics were generated to provide an overarching view of the data's distribution and central tendencies. These statistics reveal an average of approximately 113 rushing yards and 238 passing yards per game, with total yards averaging around 350. The distribution of these variables, along with the game outcomes (Win), was visually examined through histograms and box plots, elucidating the central tendencies and variability within the data. These visual explorations further affirmed the preliminary assumption that a higher aggregate of offensive yards tends to correlate with a higher likelihood of winning.
 
-The measurement aspect of this data is something that can be scrutinized. If the reader of this paper has ever watched an NFL game, they are likely very aware of the lack of certainty with regard to where the football is placed.  A player gains yards until they are tackled. Following the tackle the player hands the ball to the referee who then places it where he or she believes the ball was when the player went down, and which is where the next play begins. This spot is where the data is recorded.  Although this is a severely flawed technique that often infuriates viewers, it is not something that concerns our analysis because we are curious about the end results, how each gained yard benefits a team. We do not care about this difference because it does not impact the results of a game. For example, if a player gets six yards on a play but the referee only spots him three yards, the end result is a three-yard gain, the six yards will have no impact on the outcome.
+The measurement aspect of this data is something that can be scrutinized. If the reader of this paper has ever watched an NFL game, they are likely very aware of the lack of certainty with regard to where the football is placed. A player gains yards until they are tackled. Following the tackle the player hands the ball to the referee who then places it where he or she believes the ball was when the player went down, and which is where the next play begins. This spot is where the data is recorded. Although this is a severely flawed technique that often infuriates viewers, it is not something that concerns our analysis because we are curious about the end results, how each gained yard benefits a team. We do not care about this difference because it does not impact the results of a game. For example, if a player gets six yards on a play but the referee only spots him three yards, the end result is a three-yard gain, the six yards will have no impact on the outcome.
 
 # 3 Models {#sec-Models}
 
@@ -68,11 +71,11 @@ $$ {#eq-model1}
 The second logistic regression model, @eq-model2, narrows the focus to the fourth quarter, a critical period where games are often decided. By analyzing the same predictors but confined to the final quarter, this model, $$
 \log\left(\frac{p_2}{1-p_2}\right) = \beta_3 + \beta_4 \cdot \text{Q4\_RushingYards} + \beta_5 \cdot \text{Q4\_PassingYards}
 $$ {#eq-model2}
-, offers insights into the tactical shifts that dominate the endgame. Unlike the overall game model, the fourth-quarter model might reveal a nuanced strategic landscape, such as a negative coefficient for passing yards, indicating the potential pitfalls of a pass-heavy approach under pressure. This focused analysis is instrumental in understanding the dynamics of clutch gameplay, shedding light on the adjustments teams make in response to the scoreboard and the clock.
+, offers insights into the tactical shifts that dominate the endgame. Unlike the overall game model, the fourth-quarter model reveals a nuanced strategic landscape, such as a negative coefficient for passing yards, indicating the potential pitfalls of a pass-heavy approach under pressure. This focused analysis is instrumental in understanding the dynamics of clutch gameplay, shedding light on the adjustments teams make in response to the scoreboard and the clock.
  
 # 3.3 Justification and Appropriateness
 
-The choice of logistic regression is prudent in light of the binary structure of the outcome variable (win or loss) and the models' ability to convey the connection between playing strategies (rushing and passing) and winning odds. The interpretability of logistic regression emphasizes its suitability even more; the exponential of the coefficients accurately measures the change in odds that come with every extra yard gained, whether by passing or rushing. This gives you a concise, useful grasp of how various aspects of the game affect your chances of winning.
+The choice of logistic regression is prudent in light of the binary structure of the outcome variable (win or loss) and the models' ability to convey the connection between playing strategies (rushing and passing) and winning odds. The interpretability of logistic regression emphasizes its suitability even more; the exponential of the coefficients accurately measures the change in odds that come with every extra yard gained, whether by passing or rushing. This gives a concise, useful grasp of how various aspects of the game affect a team’s chances of winning.
 
 Furthermore, the choice to use two different models takes into account the intricate, multidimensional character of football strategy. The fourth-quarter model focuses on the crucial choices and plays that frequently determine the result, while the overall game model reflects the persistent efforts and strategies that mould the game's early and middle phases. This dual-model method enables a thorough analysis that acknowledges the urgency of the game's closing moments as well as the marathon nature of establishing a lead.
 
@@ -89,7 +92,7 @@ As an overview of the whole data set, of the 285 games played in the NFL regular
 #| label: fig-1
 library(ggplot2)
 library(tidyverse)
-data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+data <- read.csv(here::here("data/analysis_data/cleaned_data.csv"))
 ggplot(data, aes(x = RushingYards, y = PassingYards, color = as.factor(Win))) +
   geom_point() +
   labs(
@@ -105,7 +108,7 @@ ggplot(data, aes(x = RushingYards, y = PassingYards, color = as.factor(Win))) +
 
 ```{r, fig.cap= "Violin Plot of Total Yards by Wins and Losses"}
 #| label: fig-2
-data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+data <- read.csv(here::here("data/analysis_data/cleaned_data.csv"))
 ggplot(data, aes(x = as.factor(Win), y = TotalYards, fill = as.factor(Win))) +
   geom_violin() +
   labs(
@@ -122,7 +125,7 @@ ggplot(data, aes(x = as.factor(Win), y = TotalYards, fill = as.factor(Win))) +
 
 ```{r, fig.cap= "Average Yards by Wins and Losses"}
 #| label: fig-3
-data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+data <- read.csv(here::here("data/analysis_data/cleaned_data.csv"))
 avg_yards_by_outcome <- data |>
   group_by(Win) |>
   summarize(
@@ -147,7 +150,7 @@ This is further reinforced by @fig-3 which shows the average passing and rushing
 
 ```{r, fig.cap= "Average Fourth-Quarter Yards by Wins and Losses"}
 #| label: fig-4
-avg_q4_yards_by_outcome <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv") %>%
+avg_q4_yards_by_outcome <- read.csv(here::here("data/analysis_data/cleaned_data.csv")) %>%
   group_by(Win) %>%
   summarize(
     AvgRushingYards = mean(Q4_RushingYards, na.rm = TRUE),
@@ -171,7 +174,7 @@ ggplot(avg_q4_yards_by_outcome, aes(x = as.factor(Win), y = AverageYards, fill =
 
 ```{r,fig.cap= "The Fourth-Quarter Rushing and Passing Yards of Every Game in 2023"}
 #| label: fig-5
-q4_final_data_for_modeling <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+q4_final_data_for_modeling <- read.csv(here::here("data/analysis_data/cleaned_data.csv"))
 # 4th q data Q4_RushingYards,Q4_PassingYards
 ggplot(q4_final_data_for_modeling, aes(x = Q4_RushingYards, y = Q4_PassingYards, color = as.factor(Win))) +
   geom_point() +
@@ -187,7 +190,7 @@ ggplot(q4_final_data_for_modeling, aes(x = Q4_RushingYards, y = Q4_PassingYards,
 
 ```{r, fig.cap= "Distribution of Fourth-Quarter Rushing Yards by Wins and Losses"}
 #| label: fig-6
-data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+data <- read.csv(here::here("data/analysis_data/cleaned_data.csv"))
 ggplot(data, aes(x = Q4_RushingYards, fill = as.factor(Win))) +
   geom_density(alpha = 0.5) +
   labs(
@@ -200,7 +203,7 @@ ggplot(data, aes(x = Q4_RushingYards, fill = as.factor(Win))) +
 ```
 ```{r, fig.cap= "The Distribution of Fourth-Quarter Passing Yards by Wins and Losses"}
 #| label: fig-7
-data <- read.csv("~/nfl_analysis/data/analysis_data/cleaned_data.csv")
+data <- read.csv(here::here("data/analysis_data/cleaned_data.csv"))
 ggplot(data, aes(x = Q4_PassingYards, fill = as.factor(Win))) +
   geom_density(alpha = 0.5) +
   labs(
@@ -217,9 +220,9 @@ Comparing @fig-5 with @fig-1, there is quite a contrast.  Whereas @fig-1 showed 
      
 This paper relied on two models. The first was a logistic regression of overall game data while the second was a logistic regression on purely fourth quarter data. 
 
-The regression on overall data indicated a positive relationship between rushing yards and passing yards and winning the game, with rushing yards being considered more valuable with regard to winning.  This model was able to correctly predict 65.79% of outcomes in the test data, predicting 71.93% of actual wins and 59.65% of actual losses.  It demonstrated a meaningful ability to predict game outcomes based on rushing and passing yards but there was room for improvement.  
+The regression on overall data indicated a positive relationship between rushing yards and passing yards and winning the game, with rushing yards being considered more valuable with regard to winning. This model was able to correctly predict 65.79% of outcomes in the test data, predicting 71.93% of actual wins and 59.65% of actual losses.  It demonstrated a meaningful ability to predict game outcomes based on rushing and passing yards but there was room for improvement.  
 
-The second regression, using only fourth-quarter data, had more interesting results. Similar to the first model, there was a positive relationship between rushing yards and winning, but with fourth-quarter rushing yards being more valuable than overall game rushing yards.  Interestingly, there was a negative relationship between passing yardage and winning the game, in other words, the more passing yards a team had in the fourth quarter, the more likely that team was to lose the game.  This model was more accurately able to predict the outcome of games, correctly predicting 78.95% of winners and 66.67% of losers, for an overall balanced accuracy of 72.81%.
+The second regression, using only fourth-quarter data, had more interesting results. Similar to the first model, there was a positive relationship between rushing yards and winning, but with fourth-quarter rushing yards being more valuable than overall game rushing yards. Interestingly, there was a negative relationship between passing yardage and winning the game, in other words, the more passing yards a team had in the fourth quarter, the more likely that team was to lose the game.  This model was more accurately able to predict the outcome of games, correctly predicting 78.95% of winners and 66.67% of losers, for an overall balanced accuracy of 72.81%.
 
 # 5 Discussion {#sec-discussion}
 
