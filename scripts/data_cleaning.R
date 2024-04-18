@@ -9,10 +9,10 @@
 library(tidyverse)
 library(nflverse)
 
-
+# load dta
 pbp_data <- load_pbp(2023)
 
-
+# construct variiables for rushing yards, passing yards and total yards
 team_game_stats <- pbp_data |>
   group_by(game_id, posteam) |>
   summarize(
@@ -22,7 +22,7 @@ team_game_stats <- pbp_data |>
     .groups = "drop"
   )
 
-
+# construct variiables for q4 rushing yards, passing yards and total yards
 q4_team_game_stats <- pbp_data |>
   filter(qtr == 4) |>
   group_by(game_id, posteam) |>
@@ -33,7 +33,7 @@ q4_team_game_stats <- pbp_data |>
     .groups = "drop"
   )
 
-
+# construct variiables for winner
 game_scores <- pbp_data |>
   select(game_id, home_team, away_team, home_score, away_score) |>
   distinct(game_id, .keep_all = TRUE) |>
@@ -43,6 +43,7 @@ game_scores <- pbp_data |>
     TRUE ~ "Tie"
   ))
 
+# put it all together
 final_data_with_q4 <- team_game_stats |>
   left_join(q4_team_game_stats, by = c("game_id", "posteam")) |>
   left_join(game_scores, by = "game_id") |>
